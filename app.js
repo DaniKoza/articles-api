@@ -3,7 +3,7 @@ const app = express();
 const morgan = require('morgan'); // logging
 const mongoose = require('mongoose'); // connection to MongoDB
 
-mongoose.connect(`mongodb+srv://dani:TBAuye691!@youtube-articles-api.wjvn3.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`, {
+mongoose.connect(`mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@youtube-articles-api.wjvn3.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`, {
     useNewUrlParser = true,
     useUnifiedTopology: true,
 });
