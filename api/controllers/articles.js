@@ -1,6 +1,7 @@
 const Article = require('../models/article');
 const mongoose = require('mongoose');
 const Category = require('../models/category');
+const article = require('../models/article');
 
 module.exports = {
     getAllArticles: (req, res) => {
@@ -31,62 +32,93 @@ module.exports = {
     createArticle: (req, res) => {
         const { title, description, content, categoryId } = req.body;
 
-        Category.findById(categoryId)
-            .then((category) => {
-                if (!category) {
-                    return res.status(404).json({
-                        message: `Category not found or doesn't exist`
-                    });
-                }
+        Category.findById(categoryId).then((category) => {
+            if (!category) {
+                return res.status(404).json({
+                    message: 'Category not found'
+                })
+            }
 
-                const article = new Article({
-                    _id: new mongoose.Types.ObjectId(),
-                    title,
-                    description,
-                    content,
-                    categoryId
-                });
-                return article.save();
-
-            })
-            .then(() => {
-                res.status(200).json({
-                    message: `Created a new article: ${title}`
-                });
-            })
-            .catch(error => {
-                res.status(500).json({
-                    error,
-                });
+            const article = new Article({
+                _id: new mongoose.Types.ObjectId(),
+                title,
+                description,
+                content,
+                categoryId
             });
-    },
-    updateArticle: (req, res) => {
-        const articleId = req.params.articleId;
-        const articleTitle = req.body.title;
 
-        Article.updateOne({ _id: articleId }, req.body).then(() => {
+            return article.save();
+        }).then(() => {
             res.status(200).json({
-                message: `Article - ${articleTitle}, has been updated`
-            });
-        }).catch(error => {
-            res.status(500).json({
-                error,
-            })
-        });
-    },
-    deleteArticle: (req, res) => {
-        const articleId = req.params.articleId;
-
-        Article.deleteOne({ _id: articleId }).then(() => {
-            res.status(200).json({
-                message: `Article _id: ${articleId}, has been deleted!`
+                message: 'Created article'
             })
         }).catch(error => {
             res.status(500).json({
                 error
             })
         });
+    },
+    updateArticle: (req, res) => {
+        const articleId = req.params.articleId;
+        const { categoryId } = req.body;
 
+        Article.findById(articleId).then((article) => {
+            if (!article) {
+                return res.status(404).json({
+                    message: 'Article not found'
+                })
+            }
+        }).then(() => {
+            if (categoryId) {
+                return Category.findById(categoryId).then((category) => {
+                    if (!category) {
+                        return res.status(404).json({
+                            message: 'Category not found'
+                        })
+                    }
 
+                    return Article.updateOne({ _id: articleId }, req.body);
+                }).then(() => {
+                    res.status(200).json({
+                        message: 'Article Updated'
+                    })
+                }).catch(error => {
+                    res.status(500).json({
+                        error
+                    })
+                });
+            }
+
+            Article.updateOne({ _id: articleId }, req.body).then(() => {
+                res.status(200).json({
+                    message: 'Article Updated'
+                })
+            }).catch(error => {
+                res.status(500).json({
+                    error
+                })
+            });
+        })
+    },
+    deleteArticle: (req, res) => {
+        const articleId = req.params.articleId;
+
+        Article.findById(articleId).then((article) => {
+            if (!article) {
+                return res.status(404).json({
+                    message: 'Article not found'
+                })
+            }
+        }).then(() => {
+            Article.deleteOne({ _id: articleId }).then(() => {
+                res.status(200).json({
+                    message: `Article _id: ${articleId}, has been deleted!`
+                })
+            }).catch(error => {
+                res.status(500).json({
+                    error
+                })
+            });
+        });
     },
 }
