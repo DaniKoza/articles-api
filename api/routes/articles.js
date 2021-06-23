@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const { 
-    getAllArticles, 
+    getAllArticles,
+    getArticle, 
     createArticle,
     updateArticle,
     deleteArticle,
@@ -12,6 +13,8 @@ const {
 router.get('/', getAllArticles);
 
 router.post('/', createArticle);
+
+router.get('/:articleId', getArticle)
 
 router.patch('/:articleId', updateArticle);
 
