@@ -1,5 +1,5 @@
 # articles-api
-Learning Node.js - Making a REST API with it
+Learning Node.js - Making a REST API with MongoDB Atlas
 
 
 ## License & copyright
