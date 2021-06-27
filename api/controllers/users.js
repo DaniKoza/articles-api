@@ -1,14 +1,13 @@
 const mongoose = require('mongoose');
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
+const jsonWebToken = require('jsonwebtoken');
 
 module.exports = {
     signup: (req, res) => {
         const { email, password } = req.body;
 
-        
-
-        User.find({email}).then((users) => {
+        User.find({ email }).then((users) => {
             if (users.length >= 1) {
                 return res.status(409).json({
                     message: 'Email allready exists!'
@@ -39,8 +38,36 @@ module.exports = {
         });
     },
     login: (req, res) => {
-        res.status(200).json({
-            message: 'login'
+        const { email, password } = req.body;
+
+        User.find({ email }).then((users) => {
+            if (users.length === 0) {
+                return res.status(401).json({
+                    message: 'Auth failed'
+                })
+            }
+
+            const [user] = users;
+
+            bcrypt.compare(password, user.password, (error, result) => {
+                if (error || !result) {
+                    return res.status(401).json({
+                        message: 'Auth failed'
+                    });
+                }
+
+                if (result) {
+                    const token = jsonWebToken.sign(
+                        { id: user._id, email: user.email },
+                        process.env.JWT_KEY,
+                        { expiresIn: "1h" }
+                    );
+                    res.status(200).json({
+                        message: 'Auth succesful',
+                        token: token
+                    });
+                }
+            })
         });
     },
 }

@@ -1,7 +1,7 @@
 const Article = require('../models/article');
 const mongoose = require('mongoose');
 const Category = require('../models/category');
-const article = require('../models/article');
+
 
 module.exports = {
     getAllArticles: (req, res) => {
@@ -30,13 +30,15 @@ module.exports = {
 
     },
     createArticle: (req, res) => {
+        // console.log(req.file);
+        const { path: image } = req.file;
         const { title, description, content, categoryId } = req.body;
 
         Category.findById(categoryId).then((category) => {
             if (!category) {
                 return res.status(404).json({
                     message: 'Category not found'
-                })
+                })  
             }
 
             const article = new Article({
@@ -44,7 +46,8 @@ module.exports = {
                 title,
                 description,
                 content,
-                categoryId
+                categoryId,
+                image : image.replace('\\', '/')
             });
 
             return article.save();

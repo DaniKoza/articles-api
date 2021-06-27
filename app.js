@@ -1,11 +1,12 @@
 const express = require('express');
 const app = express();
 const morgan = require('morgan'); // logging
-const mongoose = require('mongoose'); // connection to MongoDB
+const mongoose = require('mongoose'); // connection manager to MongoDB
 
-mongoose.connect(`mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@youtube-articles-api.wjvn3.mongodb.net/youtube-articles-api?retryWrites=true&w=majority`, {
+mongoose.connect(process.env.MONGO_DB_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useCreateIndex: true
 });
 
 
@@ -18,6 +19,8 @@ const categoriesRoutes = require('./api/routes/categories');
 const usersRoutes = require('./api/routes/users');
 
 app.use(morgan('dev'));
+
+app.use('/uploads',express.static('uploads'));
 
 app.use(express.json());
 app.use(express.urlencoded({

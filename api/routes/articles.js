@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
-const { 
+const upload = require('../middlewares/upload');
+
+const {
     getAllArticles,
-    getArticle, 
+    getArticle,
     createArticle,
     updateArticle,
     deleteArticle,
@@ -12,7 +14,7 @@ const {
 
 router.get('/', getAllArticles);
 
-router.post('/', createArticle);
+router.post('/', upload.single('image'), createArticle);
 
 router.get('/:articleId', getArticle)
 
