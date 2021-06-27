@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const upload = require('../middlewares/upload');
+const checkAuth = require('../middlewares/checkAuth');
 
 const {
     getAllArticles,
@@ -11,16 +12,14 @@ const {
     deleteArticle,
 } = require('../controllers/articles');
 
-
+// Public routes
 router.get('/', getAllArticles);
-
-router.post('/', upload.single('image'), createArticle);
-
 router.get('/:articleId', getArticle)
 
-router.patch('/:articleId', updateArticle);
-
-router.delete('/:articleId', deleteArticle);
+// Private routes for signed in users
+router.post('/', checkAuth, upload.single('image'), createArticle);
+router.patch('/:articleId', checkAuth, updateArticle);
+router.delete('/:articleId', checkAuth, deleteArticle);
 
 
 module.exports = router;

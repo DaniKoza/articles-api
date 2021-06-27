@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan'); // logging
 const mongoose = require('mongoose'); // connection manager to MongoDB
+const checkAuth = require('./api/middlewares/checkAuth');
 
 mongoose.connect(process.env.MONGO_DB_URI, {
     useNewUrlParser: true,
@@ -20,7 +21,7 @@ const usersRoutes = require('./api/routes/users');
 
 app.use(morgan('dev'));
 
-app.use('/uploads',express.static('uploads'));
+app.use('/uploads', express.static('uploads'));
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -40,7 +41,7 @@ app.use((req, res, next) => {
 // Routes
 
 app.use('/articles', articlesRoutes);
-app.use('/categories', categoriesRoutes);
+app.use('/categories', checkAuth, categoriesRoutes);
 app.use('/users', usersRoutes);
 
 app.use((req, res, next) => {
